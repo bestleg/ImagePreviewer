@@ -1,0 +1,3 @@
+lint:
+	command -v golangci-lint >/dev/null 2>&1 || { go install github.com/golangci/golangci-lint/cmd/golangci-lint; } && \
+    golangci-lint --config=./.golangci.yaml run ./...
