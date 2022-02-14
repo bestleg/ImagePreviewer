@@ -17,16 +17,3 @@ run:
 
 down:
 	docker-compose -f ./docker-compose.yaml down
-
-
-build:
-	go build -o .bin/image-previewer ./cmd/main.go
-
-test:
-	go test -race -count 100 ./pkg/...
-
-run:
-	docker-compose -f ./docker-compose.yaml up -d
-
-down:
-	docker-compose -f ./docker-compose.yaml down

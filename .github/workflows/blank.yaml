@@ -33,9 +33,10 @@ jobs:
         run: |
           go version
           go get -u golang.org/x/lint/golint
+          go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
       # Run build of the application
       - name: Run build
-        run: make build .
+        run: make build
 
       # Run vet & lint on the code
       - name: Run lint
