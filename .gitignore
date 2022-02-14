@@ -1,7 +1,5 @@
 /bin
 /vendor
-/vendor.pb
-/vendor.protogen
 .DS_STORE
 /.idea
 /.vscode
