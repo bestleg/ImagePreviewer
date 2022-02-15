@@ -1,0 +1,35 @@
+version: "3.3"
+
+services:
+  image-previewer:
+    container_name: image-previewer
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    logging:
+      driver: none
+    ports:
+      - "8081:8081"
+    environment:
+      LOG_LEVEL: "info"
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+    logging:
+      driver: none
+    volumes:
+      - ./integration-tests/test_suites:/test_suites
+      - ./integration-tests/nginx.conf:/etc/nginx/conf.d/default.conf
+
+  integration-tests:
+    image: golang:1.17
+    volumes:
+      - ./:/app/
+    working_dir: /app
+    command: sh -c 'go test -v ./integration-tests/...'
+    depends_on:
+      - nginx
+      - image-previewer

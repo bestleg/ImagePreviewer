@@ -8,8 +8,9 @@ const (
 	SupportedContentTypes = "image/jpeg"
 	SupportedHeader       = "HTTP/1.1"
 
-	ErrNotSupportedContentType    = "got not supported content type"
-	ErrNotSupportedHeader         = "got not supported header"
+	ErrNotSupportedContentType    = "not supported content type"
+	ErrNotSupportedHeader         = "not supported header"
+	ErrNotSupportedScheme         = "not http"
 	ErrFailedToReadRequestBody    = "failed to read request body"
 	ErrFailedToPerformRequest     = "failed to perform request"
 	ErrFailedToParseImageURL      = "failed to parse image url"

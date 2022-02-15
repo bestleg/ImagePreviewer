@@ -38,10 +38,12 @@ jobs:
       - name: Run build
         run: make build
 
-      # Run vet & lint on the code
+      # Run lint on the code
       - name: Run lint
-        run: |
-          make lint
+        run: make lint
       # Run testing on the code
       - name: Run testing
         run: make test
+      # Run integration testing on the code
+      - name: Run integration-testing
+        run: make test-integration

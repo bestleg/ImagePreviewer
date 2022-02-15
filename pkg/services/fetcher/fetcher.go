@@ -56,7 +56,9 @@ func prepareRequest(ctx context.Context, rawURL string, header http.Header) (*ht
 	if err != nil {
 		return nil, errors.Wrap(err, utils.ErrFailedToParseImageURL)
 	}
-
+	if parsedURL.Scheme != "http" {
+		return nil, errors.New(utils.ErrNotSupportedScheme)
+	}
 	request.URL = parsedURL
 	request.Header = header
 	return request, nil
