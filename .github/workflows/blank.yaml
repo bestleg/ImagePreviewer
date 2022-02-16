@@ -27,23 +27,22 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.17.0' # The Go version to download (if necessary) and use.
-
-      # Install all the dependencies
-      - name: Install dependencies
-        run: |
-          go version
-          go get -u golang.org/x/lint/golint
-          go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
-      # Run build of the application
+      # Run build
       - name: Run build
         run: make build
-
-      # Run lint on the code
-      - name: Run lint
-        run: make lint
       # Run testing on the code
       - name: Run testing
         run: make test
       # Run integration testing on the code
       - name: Run integration-testing
         run: make test-integration
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.42
+          args: --config=./.golangci.yaml

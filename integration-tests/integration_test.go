@@ -14,6 +14,8 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+const imageType = "image/jpeg"
+
 type TestSuite struct {
 	suite.Suite
 	client *http.Client
@@ -34,7 +36,7 @@ func TestFill(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
-	require.True(t, res.Header.Get("Content-Type") == "image/jpeg")
+	require.True(t, res.Header.Get("Content-Type") == imageType)
 
 	config, _, err := image.DecodeConfig(bytes.NewReader(body))
 	require.NoError(t, err)
@@ -54,7 +56,7 @@ func TestResize(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
-	require.True(t, res.Header.Get("Content-Type") == "image/jpeg")
+	require.True(t, res.Header.Get("Content-Type") == imageType)
 
 	config, _, err := image.DecodeConfig(bytes.NewReader(body))
 	require.NoError(t, err)
@@ -114,7 +116,7 @@ func TestFillFromCache(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
-	require.True(t, res.Header.Get("Content-Type") == "image/jpeg")
+	require.True(t, res.Header.Get("Content-Type") == imageType)
 
 	config, _, err := image.DecodeConfig(bytes.NewReader(body))
 	require.NoError(t, err)
@@ -122,11 +124,12 @@ func TestFillFromCache(t *testing.T) {
 	require.Equal(t, config.Width, width)
 	require.Equal(t, config.Height, height)
 
+	// nolint:bodyclose
 	resFromCache, body, err := s.doRequest(t, url, "fill", width, height)
 	require.NoError(t, err)
 
 	require.Equal(t, http.StatusOK, resFromCache.StatusCode)
-	require.True(t, resFromCache.Header.Get("Content-Type") == "image/jpeg")
+	require.True(t, resFromCache.Header.Get("Content-Type") == imageType)
 
 	configFromCache, _, err := image.DecodeConfig(bytes.NewReader(body))
 	require.NoError(t, err)
