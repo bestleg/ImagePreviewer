@@ -11,11 +11,11 @@ import (
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/bestleg/ImagePreviewer/pkg/logging"
+	lru "github.com/bestleg/ImagePreviewer/pkg/services/cache"
 	transformerPkg "github.com/bestleg/ImagePreviewer/pkg/services/cropper"
 	fetcherPkg "github.com/bestleg/ImagePreviewer/pkg/services/fetcher"
 	"github.com/bestleg/ImagePreviewer/pkg/services/http"
 	"github.com/bestleg/ImagePreviewer/pkg/services/processor"
-	lru "github.com/hashicorp/golang-lru"
 )
 
 var (
@@ -61,15 +61,7 @@ func main() {
 		}()
 	}
 
-	cache, err := lru.NewWithEvict(cacheSize, func(key interface{}, value interface{}) {
-		if path, ok := value.(string); ok {
-			defer func() {
-				if err := os.Remove(path); err != nil {
-					logger.Fatalf("failed to remove item from cache: %v", err)
-				}
-			}()
-		}
-	})
+	cache := lru.NewCache(cacheSize)
 	if err != nil {
 		logger.Fatalf("failed to setup cache %v", err)
 	}

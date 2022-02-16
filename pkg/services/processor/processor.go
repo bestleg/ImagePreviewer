@@ -9,10 +9,10 @@ import (
 	"path"
 	"strconv"
 
+	lru "github.com/bestleg/ImagePreviewer/pkg/services/cache"
 	"github.com/bestleg/ImagePreviewer/pkg/services/cropper"
 	"github.com/bestleg/ImagePreviewer/pkg/services/fetcher"
 	"github.com/bestleg/ImagePreviewer/pkg/utils"
-	"github.com/hashicorp/golang-lru/simplelru"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -23,7 +23,7 @@ type Processor struct {
 	logger   *zap.SugaredLogger
 	fetcher  fetcher.Fetcher
 	cropper  cropper.Transformer
-	cache    simplelru.LRUCache
+	cache    lru.Cache
 }
 
 func NewProcessor(
@@ -31,7 +31,7 @@ func NewProcessor(
 	l *zap.SugaredLogger,
 	f fetcher.Fetcher,
 	t cropper.Transformer,
-	c simplelru.LRUCache,
+	c lru.Cache,
 ) *Processor {
 	return &Processor{cacheDir: cacheDir, logger: l, fetcher: f, cropper: t, cache: c}
 }
@@ -119,13 +119,13 @@ func (p *Processor) process(
 		return nil, errors.Wrap(err, "failed to crop image")
 	}
 
-	imgPath := path.Join(p.cacheDir, cacheKey+".jpeg")
+	imgPath := path.Join(p.cacheDir, string(cacheKey)+".jpeg")
 	err = ioutil.WriteFile(imgPath, img, fs.FileMode(utils.WritePerm))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to save image")
 	}
 
-	p.cache.Add(cacheKey, imgPath)
+	p.cache.Set(cacheKey, imgPath)
 
 	return img, nil
 }

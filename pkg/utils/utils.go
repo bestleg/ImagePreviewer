@@ -5,16 +5,17 @@ import (
 	"strings"
 
 	"github.com/OneOfOne/xxhash"
+	"github.com/bestleg/ImagePreviewer/pkg/services/cache"
 )
 
 // GetHash get new hash from string.
-func GetHash(text string) (string, error) {
+func GetHash(text string) (cache.Key, error) {
 	hasher := xxhash.New64()
 	_, err := hasher.Write([]byte(text))
 	if err != nil {
 		return "", err
 	}
-	return hex.EncodeToString(hasher.Sum(nil)), nil
+	return cache.Key(hex.EncodeToString(hasher.Sum(nil))), nil
 }
 
 // Contains returns true if target string is present in the strings slice.

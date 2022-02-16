@@ -63,6 +63,20 @@ func TestResize(t *testing.T) {
 	require.Equal(t, config.Height, height)
 }
 
+func TestBadResize(t *testing.T) {
+	s := NewTestSuite()
+
+	url := "nginx:80/orig_fox.jpg"
+	width, height := 111111, 2
+
+	// nolint:bodyclose
+	res, body, err := s.doRequest(t, url, "resize", width, height)
+	require.NoError(t, err)
+
+	require.Equal(t, http.StatusBadGateway, res.StatusCode)
+	require.Equal(t, "failed to crop image: jpeg: image is too large to encode\n", string(body))
+}
+
 func TestServerDoesntExist(t *testing.T) {
 	s := NewTestSuite()
 
@@ -87,6 +101,38 @@ func TestCropNotImage(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, http.StatusBadGateway, res.StatusCode)
+}
+
+func TestFillFromCache(t *testing.T) {
+	s := NewTestSuite()
+
+	url := "nginx:80/orig_gopher.jpg"
+	width, height := 100, 200
+
+	// nolint:bodyclose
+	res, body, err := s.doRequest(t, url, "fill", width, height)
+	require.NoError(t, err)
+
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.True(t, res.Header.Get("Content-Type") == "image/jpeg")
+
+	config, _, err := image.DecodeConfig(bytes.NewReader(body))
+	require.NoError(t, err)
+
+	require.Equal(t, config.Width, width)
+	require.Equal(t, config.Height, height)
+
+	resFromCache, body, err := s.doRequest(t, url, "fill", width, height)
+	require.NoError(t, err)
+
+	require.Equal(t, http.StatusOK, resFromCache.StatusCode)
+	require.True(t, resFromCache.Header.Get("Content-Type") == "image/jpeg")
+
+	configFromCache, _, err := image.DecodeConfig(bytes.NewReader(body))
+	require.NoError(t, err)
+
+	require.Equal(t, configFromCache.Width, width)
+	require.Equal(t, configFromCache.Height, height)
 }
 
 // nolint:thelper
